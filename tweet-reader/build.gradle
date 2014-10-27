@@ -1,0 +1,11 @@
+description = "Reading and processing tweets"
+apply plugin: 'application'
+
+mainClassName = 'com.github.spruce.app.LinkAnalyzerApp'
+
+dependencies {
+    compile project(':common')
+    compile 'com.twitter:hbc-core:2.2.0'
+    compile 'com.beust:jcommander:1.35'
+
+}
