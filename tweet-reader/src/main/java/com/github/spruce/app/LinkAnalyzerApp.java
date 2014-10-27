@@ -27,7 +27,7 @@ public class LinkAnalyzerApp {
             return;
         }
 
-        LinkAnalyzer linkAnalyzer = new LinkAnalyzer();
+        LinkAnalyzer linkAnalyzer = new LinkAnalyzer(null);
     }
 
     private static class Args {
@@ -48,6 +48,12 @@ public class LinkAnalyzerApp {
 
         @Parameter(names = {"-i", "--id"}, description = "Spruce app id")
         private String appKey = Configs.spruce().apiKey().asString();
+
+        @Parameter(names = {"-t", "--token"}, description = "Tweeter access token")
+        private String accessToken = Configs.spruce().apiKey().asString();
+
+        @Parameter(names = {"-ts", "--token-secret"}, password = true, description = "Tweeter access token secret")
+        private String accessTokenSecret = Configs.spruce().apiKey().asString();
 
         public boolean isHelp() {
             return help;
@@ -71,6 +77,14 @@ public class LinkAnalyzerApp {
 
         public String getAppKey() {
             return appKey;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public String getAccessTokenSecret() {
+            return accessTokenSecret;
         }
     }
 }

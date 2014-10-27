@@ -6,18 +6,20 @@ import com.google.common.base.Preconditions;
  * @author Mamad Asgari
  * @since 22/09/2014
  */
-public final class SpruceParams implements ConfigGroup {
+public final class SpruceAppParams implements ConfigGroup {
 
     public static final String NAME = "spruce";
 
     public static final String URL = "api.url";
     public static final String API_KEY = "api.key";
     public static final String API_SECRET = "api.secret";
+    public static final String ACCESS_TOKEN = "access.token";
+    public static final String ACCESS_TOKEN_SECRET = "access.token.secret";
     public static final String MAX_TWEETS = "max.tweets";
 
     private final ConfigGroupImpl delegate;
 
-    protected SpruceParams(ConfigGroupImpl delegate) {
+    protected SpruceAppParams(ConfigGroupImpl delegate) {
         this.delegate = delegate;
         Preconditions.checkArgument(NAME.equals(delegate.name()));
         //register defaults
@@ -45,6 +47,14 @@ public final class SpruceParams implements ConfigGroup {
 
     public Param apiKey() {
         return entry(API_KEY);
+    }
+
+    public Param accessToken() {
+        return entry(ACCESS_TOKEN);
+    }
+
+    public Param accessTokenSecret() {
+        return entry(ACCESS_TOKEN_SECRET);
     }
 
     public Param maxTweets() {

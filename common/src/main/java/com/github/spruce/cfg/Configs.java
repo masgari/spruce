@@ -21,7 +21,7 @@ public final class Configs {
     private static Configs instance;
     private final CompositeConfiguration configuration;
 
-    private final SpruceParams spruce;
+    private final SpruceAppParams spruce;
 
     private Configs() {
         this(System.getProperty(CONFIG_FILE, System.getProperty("user.home") + "/.spruce"));
@@ -45,10 +45,10 @@ public final class Configs {
 
         configuration.addConfiguration(new SystemConfiguration());
 
-        spruce = new SpruceParams(new ConfigGroupImpl(SpruceParams.NAME, configuration));
+        spruce = new SpruceAppParams(new ConfigGroupImpl(SpruceAppParams.NAME, configuration));
     }
 
-    public static SpruceParams spruce() {
+    public static SpruceAppParams spruce() {
         return get().spruce;
     }
 
