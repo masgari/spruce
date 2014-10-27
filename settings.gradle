@@ -1,0 +1,3 @@
+rootProject.name = 'spruce'
+
+include 'tweet-reader', 'common', 'web-frontend', 'web-backend'
