@@ -1,12 +1,14 @@
 package com.github.spruce.app;
 
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
 import com.github.spruce.analyzer.LinkAnalyzer;
-import com.github.spruce.cfg.Configs;
-import com.google.common.collect.Lists;
+import com.github.spruce.analyzer.LinkAnalyzingResults;
+import com.github.spruce.client.TweetReader;
+import com.github.spruce.module.LinkAnalyzerAppModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
-import java.util.List;
+import static com.github.spruce.module.LinkAnalyzerAppModule.Args;
 
 /**
  * @author mamad
@@ -26,65 +28,24 @@ public class LinkAnalyzerApp {
             parser.usage();
             return;
         }
+        Injector injector = Guice.createInjector(new LinkAnalyzerAppModule(args));
+        TweetReader tweetReader = injector.getInstance(TweetReader.class);
+        try {
+            tweetReader.connect();
 
-        LinkAnalyzer linkAnalyzer = new LinkAnalyzer(null);
-    }
-
-    private static class Args {
-        @Parameter(description = "List of tweeter account to analyze links in their tweets", required = true)
-        private List<String> accounts = Lists.newArrayList();
-
-        @Parameter(names = {"-h", "--help"}, description = "Display this help message.", help = true)
-        private boolean help;
-
-        @Parameter(names = {"-m", "--max-tweets"}, description = "Maximum number of tweets to read")
-        private int maxTweets = Configs.spruce().maxTweets().asInt();
-
-        @Parameter(names = {"-a", "--api"}, description = "Url of tweeter api")
-        private String apiUrl = Configs.spruce().url().asString();
-
-        @Parameter(names = {"-s", "--secret"}, password = true, description = "Spruce app api secret")
-        private String appSecret = Configs.spruce().apiSecret().asString();
-
-        @Parameter(names = {"-i", "--id"}, description = "Spruce app id")
-        private String appKey = Configs.spruce().apiKey().asString();
-
-        @Parameter(names = {"-t", "--token"}, description = "Tweeter access token")
-        private String accessToken = Configs.spruce().apiKey().asString();
-
-        @Parameter(names = {"-ts", "--token-secret"}, password = true, description = "Tweeter access token secret")
-        private String accessTokenSecret = Configs.spruce().apiKey().asString();
-
-        public boolean isHelp() {
-            return help;
-        }
-
-        public List<String> getAccounts() {
-            return accounts;
-        }
-
-        public int getMaxTweets() {
-            return maxTweets;
-        }
-
-        public String getApiUrl() {
-            return apiUrl;
-        }
-
-        public String getAppSecret() {
-            return appSecret;
-        }
-
-        public String getAppKey() {
-            return appKey;
-        }
-
-        public String getAccessToken() {
-            return accessToken;
-        }
-
-        public String getAccessTokenSecret() {
-            return accessTokenSecret;
+            LinkAnalyzer linkAnalyzer = injector.getInstance(LinkAnalyzer.class);
+            LinkAnalyzingResults results = linkAnalyzer.analyze(args.getMaxTweets());
+            if (results.hasAnyLink()) {
+                System.out.printf("%-50s\t%-10s%n", "URL", "Count");
+                System.out.printf("%-50s\t%-10s%n", "----------------------------------------", "--------");
+                results.consume(args.getMaxLinks(), (url, count) -> {
+                    System.out.printf("%-50s\t%,d%n", url, count);
+                });
+            } else {
+                System.out.printf("No links found in the %,d tweets.", results.getTotalTweets());
+            }
+        } finally {
+            tweetReader.stop();
         }
     }
 }

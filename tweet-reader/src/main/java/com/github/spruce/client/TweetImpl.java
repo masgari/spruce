@@ -6,6 +6,7 @@ package com.github.spruce.client;
  */
 public class TweetImpl implements Tweet {
     private final String json;
+
     public TweetImpl(String json) {
         this.json = json;
     }
@@ -17,15 +18,11 @@ public class TweetImpl implements Tweet {
 
     @Override
     public String getText() {
-        return null;
+        return json;
     }
 
     @Override
     public String getUser() {
         return null;
-    }
-
-    public String getJson() {
-        return json;
     }
 }

@@ -1,14 +1,15 @@
 package com.github.spruce.client;
 
-import com.google.common.collect.Lists;
+import com.twitter.Extractor;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.function.Consumer;
+import java.util.List;
 
 import static com.github.spruce.cfg.Configs.spruce;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author mamad
@@ -18,6 +19,7 @@ public class HosebirdTweetReaderIntegTest {
     @Before
     public void setUp() throws Exception {
         Assume.assumeNotNull(spruce().apiSecret());
+        Assume.assumeNotNull(spruce().accessTokenSecret());
     }
 
     @Test
@@ -26,13 +28,19 @@ public class HosebirdTweetReaderIntegTest {
                 spruce().apiSecret().asString(),
                 spruce().accessToken().asString(),
                 spruce().accessTokenSecret().asString(),
-                Lists.newArrayList("Android", "TV"));
-        long count = 0;
+                StatusesEndpointBuilder.create().terms("job", "movie").get());
+        long count = 10;
+        Extractor extractor = new Extractor();
         try {
             reader.connect();
             count = reader.consume(tweet -> {
                 assertNotNull(tweet);
-                System.out.println("tweet = " + ((TweetImpl) tweet).getJson());
+                String tweetText = tweet.getText();
+                List<String> urls = extractor.extractURLs(tweetText);
+                if (!urls.isEmpty()) {
+                    System.out.println("urls = " + urls);
+                    System.out.println("tweet = " + tweetText);
+                }
             }, 5);
         } finally {
             reader.stop();
